@@ -1,5 +1,13 @@
 /// <reference path="p5.global-mode.d.ts" />
 
+class Signal{
+    constructor(start_time, end_time, draw_shape){
+        this.start_time = start_time;
+        this.end_time = end_time;
+        this.draw_shape = draw_shape
+    }
+}
+
 let debug = false
 
 let ROOM_WIDTH = 150
@@ -25,7 +33,7 @@ const scheduleTypes = {
 let DEFAULT_ROOM_SEC = (5 * 60) + 30
 let DEFAULT_PASSING_SEC = 15
 
-const DEFAULT_SCHEDULE = [
+const DEFAULT_SCHEDULE = {movement: [
     {type: scheduleTypes.ROOM,    duration: 4 * 60,      location: rooms[rooms.findIndex((element) => element.name === 'In Line')] },
     {type: scheduleTypes.PASSING, duration: 15 },
     {type: scheduleTypes.ROOM,    duration: 1.75 * 60,      location: rooms[rooms.findIndex((element) => element.name === 'Lobby')] },
@@ -39,11 +47,12 @@ const DEFAULT_SCHEDULE = [
     {type: scheduleTypes.ROOM,    duration: DEFAULT_ROOM_SEC,      location: rooms[rooms.findIndex((element) => element.name === 'Zone 3')] },
     {type: scheduleTypes.PASSING, duration: DEFAULT_PASSING_SEC},
     {type: scheduleTypes.ROOM,    duration: DEFAULT_ROOM_SEC,      location: rooms[rooms.findIndex((element) => element.name === 'Exit')] },
-]
+    ],
+    signals: []}
 
 const DEFAULT_SCHEDULE_OFFSET = DEFAULT_ROOM_SEC + (2 * DEFAULT_PASSING_SEC)
 
- const DD_100_SCHEDULE = [
+const DD_100_SCHEDULE = {movement: [
     {type: scheduleTypes.ROOM,    duration: 4.0 * 60,              location: rooms[rooms.findIndex((element) => element.name === 'In Line')] },
     {type: scheduleTypes.PASSING, duration: 15 },
     {type: scheduleTypes.ROOM,    duration: (1.75 * 60),      location: rooms[rooms.findIndex((element) => element.name === 'Lobby')] },
@@ -54,12 +63,43 @@ const DEFAULT_SCHEDULE_OFFSET = DEFAULT_ROOM_SEC + (2 * DEFAULT_PASSING_SEC)
     {type: scheduleTypes.PASSING, duration: 30 },
     {type: scheduleTypes.ROOM,    duration: 5.75 *60,    location: rooms[rooms.findIndex((element) => element.name === 'Zone 2')] },
     {type: scheduleTypes.PASSING, duration: 15},
-    {type: scheduleTypes.ROOM,    duration: 4.25*60,      location: rooms[rooms.findIndex((element) => element.name === 'Zone 3')] },
-    {type: scheduleTypes.PASSING, duration: 1.75 * 60},
+    {type: scheduleTypes.ROOM,    duration: 5.75*60,      location: rooms[rooms.findIndex((element) => element.name === 'Zone 3')] },
+    {type: scheduleTypes.PASSING, duration: .25 * 60},
     {type: scheduleTypes.ROOM,    duration: 1.5 * 60,        location: rooms[rooms.findIndex((element) => element.name === 'Exit')] },
-]
+    ],
+    signals: [
+        new Signal((4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15),(4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15) + 5, () => {arrow(550, 325,400, 175)}), //Preshow/Zone 1 door close -> lobby -> preshow door open
+        new Signal((4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60), (4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60) + 5, () => {arrow(700,335,370, 180)}), //Door 1/2 open -> ready lobby->preshow door
+        new Signal((4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60 + 30 + (5.75 - 1) * 60), (4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60 + 30 + (5.75 - 1) * 60) + 5, () => {arrow(775,325, 625, 325)}),
+        new Signal((4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60 + 30 + (5.75) * 60 + 15 + (5.75 - 1.75) * 60), (4*60 + 15 + 1.75*60 + 15 + 5.5*60 + 15 + (5.25)*60 + 30 + (5.75) * 60 + 15 + (5.75 - 1.75) * 60) + 5, () =>{
+            arrow(925, 325, 325, 175)
+        })
+    ]}
 
 const DD_100_OFFSET = 6*60
+
+const CUSTOM_SCHEDULE = {movement: [
+    {type: scheduleTypes.ROOM,    duration: 4.0 * 60,              location: rooms[rooms.findIndex((element) => element.name === 'In Line')] },
+    {type: scheduleTypes.PASSING, duration: 15 },
+    {type: scheduleTypes.ROOM,    duration: (1.75 * 60),      location: rooms[rooms.findIndex((element) => element.name === 'Lobby')] },
+    {type: scheduleTypes.PASSING, duration: 15 },
+    {type: scheduleTypes.ROOM,    duration: (5.5 * 60) ,    location: rooms[rooms.findIndex((element) => element.name === 'Preshow')] },
+    {type: scheduleTypes.PASSING, duration: 15 },
+    {type: scheduleTypes.ROOM,    duration: 5.25 * 60,      location: rooms[rooms.findIndex((element) => element.name === 'Zone 1')] },
+    {type: scheduleTypes.PASSING, duration: 30 },
+    {type: scheduleTypes.ROOM,    duration: 5.75 *60,    location: rooms[rooms.findIndex((element) => element.name === 'Zone 2')] },
+    {type: scheduleTypes.PASSING, duration: 15},
+    {type: scheduleTypes.ROOM,    duration: 5.75*60,      location: rooms[rooms.findIndex((element) => element.name === 'Zone 3')] },
+    {type: scheduleTypes.PASSING, duration: .25 * 60},
+    {type: scheduleTypes.ROOM,    duration: 1.5 * 60,        location: rooms[rooms.findIndex((element) => element.name === 'Exit')] },
+    ],
+    signals: []}
+
+const DEFAULT_CUSTOM_OFFSET = 6 * 60
+let CUSTOM_OFFSET = 6*60
+
+let schedule_inputs
+let schedule_controls = Array()
 
 //Initialize Groups
 let groups = []
@@ -68,7 +108,7 @@ function init_groups(schedule, offset, number){
     groups = []
     for (const num of Array(15).keys()){
         groups.push(
-            {name: num + 1, hue: (num * .38) % 1, timeOffset: num*(offset) , schedule: schedule}
+            {name: num + 1, hue: (num * .38) % 1, timeOffset: num*(offset) , schedule: schedule.movement, signals: schedule.signals}
         )
     }
 }
@@ -120,10 +160,47 @@ function setup(){
 
     scheduleSelect = createSelect()
     scheduleSelect.position(75,475)
-    scheduleSelect.option('Rolling Schedule')
     scheduleSelect.option('100% DD Schedule')
-    scheduleSelect.selected('100% DD Schedule')
+    scheduleSelect.option('Rolling Schedule')
+    scheduleSelect.option('Custom Schedule')
+    //scheduleSelect.selected('100% DD Schedule')
+    scheduleSelect.selected('Custom Schedule')
     scheduleSelect.changed(setSchedule)
+
+    //List of inputs for customizing schedule:
+    schedule_inputs = Array()
+
+    CUSTOM_SCHEDULE.movement.forEach((element, i) => {
+        let newInput = createInput(element.duration)
+        newInput.size(100,10)
+        let label
+
+        if (element.location?.name) label = element.location.name
+        else if (element.type == scheduleTypes.PASSING){
+            label = ""
+        }
+        else console.warn("Unknown element, cannot create input")
+        schedule_inputs.push(
+            {
+                label: label,
+                input: newInput
+            }
+        )
+    })
+
+    spacing = createInput(CUSTOM_OFFSET)
+    spacing.size(100,20)
+    schedule_controls.push({ id: "spacing", element: spacing, x:250, y:100})
+
+    set_button = createButton("Set Schedule")
+    set_button.mousePressed(() => {
+        tryToSetCustomSchedule(schedule_inputs, spacing)})
+    schedule_controls.push({ id: "setsched", element: set_button, x: 250, y: 150})
+
+    reset_button = createButton("Reset Schedule")
+    reset_button.mousePressed(() => {
+        resetCustomSchedule(schedule_inputs, spacing)})
+    schedule_controls.push({ id: "resetsched", element: reset_button, x: 250, y: 175})
 }
   
 function draw() {
@@ -231,6 +308,17 @@ function draw() {
         textSize(32)
         textAlign(CENTER, CENTER)
         text(group.name, ...center)
+
+        //Signals:
+        //console.log(group.signals)
+        group.signals.forEach((signal, i) => {
+            if (signal.start_time < groupTime && groupTime < signal.end_time){
+                push()
+                signal.draw_shape() 
+                pop()
+                //console.log(`Drawing signal: ${signal.start_time} < ${groupTime} < ${signal.end_time}`)
+            }
+        })
     }
 
     //Draw time
@@ -299,6 +387,7 @@ function draw() {
     }
     pop()
 
+    //Debug info
     push()
     textSize(12)
     textAlign(LEFT, TOP)
@@ -308,7 +397,9 @@ function draw() {
         const data = {
             'debug': debug,
             'current time': currentTime,
-            'graph_x_scale': graph_x_scale
+            'graph_x_scale': graph_x_scale,
+            'mouse_x': mouseX,
+            'mouse_y': mouseY
         }
         let index = 0
         for (const [key, value] of Object.entries(data)){
@@ -320,6 +411,17 @@ function draw() {
         text("Press 'd' for debug info", 0, 10)
     }
     pop()
+
+    //custom schdule window
+    fill(230)
+
+    if (scheduleSelect.value() === "Custom Schedule"){
+        let inputs = Array()
+        makeCustomScheduleWindow(700, 20, schedule_inputs, schedule_controls)
+    }
+    else {
+        hideCustomScheduleWindow(schedule_inputs, schedule_controls)
+    }
 }
 
 function getRectCenter(rect) {
@@ -450,12 +552,16 @@ function createGraph(gp){
                 gp.rect(trackTime, y, period.duration, GRAPHLINE_HEIGHT);
             }
             else if (period.type == scheduleTypes.PASSING){
+                push()
                 previousRoom = group.schedule[index - 1]
                 //console.log({previousRoom})
                 nextRoom = group.schedule[index + 1]
                 y = GRAPHLINE_HEIGHT * rooms.findIndex((room) => {return room.name === previousRoom.location.name})
                 gp.fill(...hslToRgb(group.hue, .6, .6), 100)
+                gp.stroke(0)
+                gp.strokeWeight(1)
                 gp.rect(trackTime, y, period.duration, GRAPHLINE_HEIGHT * 2);
+                pop()
             }
 
             
@@ -560,6 +666,10 @@ function setSchedule(){
         init_groups(DEFAULT_SCHEDULE, DEFAULT_SCHEDULE_OFFSET, 15)
         currentTime = 0
     }
+    else if (sched === "Custom Schedule"){
+        init_groups(CUSTOM_SCHEDULE, CUSTOM_OFFSET, 15)
+        currentTime = 0
+    }
     else {
         console.error("Invalid schedule selected")
     }
@@ -577,4 +687,110 @@ function secondsPerDivision(scale) {
     }
     return 15
     
+}
+
+function makeCustomScheduleWindow(x, y, custom_schedule_inputs, buttons){    
+    push()
+    rect(x,y,400,200)
+
+    fill(0)
+    stroke(0)
+    textSize(20)
+    textAlign(RIGHT, TOP)
+    text("CUSTOM SCHEDULE\nTIMINGS", x + 390, y+10)
+
+    textSize(16)
+    textAlign(RIGHT, CENTER)
+    
+
+
+    custom_schedule_inputs.forEach((element, i) => {
+        text(element.label, x + 65, y + (15 * i) + 10)
+        element.input.position(x + 75, y + (15 * i) + 10) 
+        element.input.show()
+    });
+
+    textAlign(LEFT, BOTTOM)
+    text("Spacing", x + 245, y + 90)
+
+    buttons.forEach((btn) => {
+        btn.element.position(x + btn.x, y + btn.y)
+        btn.element.show()
+    })
+
+    pop()
+}
+
+function hideCustomScheduleWindow(custom_schedule_inputs, buttons){
+    custom_schedule_inputs.forEach((element) => {
+        element.input.hide()
+    })
+
+    buttons.forEach((btn) => {
+        btn.element.hide()
+    })
+}
+
+function tryToSetCustomSchedule(custom_schedule_inputs, spacing_input) {
+    custom_schedule_inputs.forEach((element) => {
+            if (isNaN(element.input.value())) {
+                console.warn(`Can't set schedule: ${element.input.value()} of input for ${element.label} is not a number`)
+                return false
+            }
+        }
+    );
+
+    if (isNaN(spacing_input.value())){
+        console.warn(`Can't set schedule: ${spacing.value()} of input for spacing is not a number`)
+        return false
+    }
+    
+
+    schedule_inputs.forEach((element, i) => {
+        CUSTOM_SCHEDULE.movement[i].duration = +element.input.value()
+    });
+
+    CUSTOM_OFFSET = spacing_input.value()
+
+    setSchedule()
+
+    console.log("Set new schedule")
+    return true
+}
+
+function resetCustomSchedule(custom_schedule_inputs, spacing_input){
+    CUSTOM_SCHEDULE.movement.forEach((element, i) => {
+        var newValue = DD_100_SCHEDULE.movement[i].duration
+        element.duration = newValue
+        custom_schedule_inputs[i].input.elt.value = newValue
+    })
+
+    CUSTOM_OFFSET = DEFAULT_CUSTOM_OFFSET;
+    setSchedule()
+}
+
+function arrow(x1, y1, x2, y2){
+    push();
+    stroke(255,0,0)
+    strokeWeight(3)
+    line(x1, y1, x2, y2)
+    noFill()
+    circle(x1, y1, 10)
+    fill(255,0,0)
+    circle(x2, y2, 10)
+
+    pop()
+}
+
+function arcArrow(x1, y1, x2, y2, x3, y3, x4, y4){
+    push();
+    stroke(255,0,0)
+    strokeWeight(3)
+    noFill()
+    curve(x1, y1, x2, y2, x3, y3, x4, y4)
+    circle(x2, y2, 10)
+    fill(255,0,0)
+    circle(x3, y3, 10)
+
+    pop()
 }
