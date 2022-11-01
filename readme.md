@@ -2,6 +2,8 @@
 
 Provides on-rails simulation of a number of groups passing through a technical space with 5 rooms, plus and entry and exit.
 
+![A screenshot of schedule-sim running](screenshot.PNG)
+
 ## Running the Sim
 
 1. From the Code menu (button) in the upper right of this page, select 'Download ZIP'
