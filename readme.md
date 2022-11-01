@@ -46,3 +46,8 @@ The schedules are:
   * A purely "rolling" schedule, where each room is exactly 5.5 minutes and each transition is 15 seconds.
   * A "custom" schedule. This schedule defaults to being the same as the 100% DD schedule, but the duration of each transition and room can be adjusted using the pop-up menu.
 
+#### Custom Schedule
+
+When the 'custom schedule' is selected, an additional menu appears in the top-right of the screen, allowing the user to adjust the timings and transitions between each room. All timings are in seconds.
+
+The timings listed default to the values in the 100% DD schedule. After changing the timing values, pressing `Set Schedule` will push the new timing values into the simulation. Pressing `Reset Schedule` will reset all values to match the 100% DD schedule, and push them into the simulation.
